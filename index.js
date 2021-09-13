@@ -13,6 +13,8 @@ import { type } from "os";
 
 var now = Date.now();
 var data =[];
+var bigdata = [];
+var groupbydata = [];
 
 
 for (var i = timeserie.length -1; i >= 0; i--) {
@@ -43,23 +45,49 @@ client.query('SELECT * FROM default.q20 limit 5;')
   .catch(err => console.error("err",err))
   .done(() => client.close().catch(err => console.error(err)));
 
-client.getResultsMetadata('SELECT  TOP(5) FROM default.q20 limit 5;')
+client.getResultsMetadata('SELECT * FROM default.q20 limit 5;')
   .then(metaData => console.log(metaData))
   .catch(err => console.error(err));
 
-client.explain('SELECT TOP(5) FROM default.q20 limit 5;')
+client.explain('SELECT * FROM default.q20 limit 5;')
   .then(explanation => console.log(explanation))
   .catch(err => console.error(err));
 
 
-app.get('/posts',(req, res)=>{
-  res.json(JSON.stringify(data));
+  client.query('SELECT * FROM default.q20 ;')
+  .then(result =>{  bigdata = result;})
+  .catch(err => console.error("err",err))
+  .done(() => client.close().catch(err => console.error(err)));
 
-});
+client.getResultsMetadata('SELECT * FROM default.q20 ;')
+  .then(metaData => console.log(metaData))
+  .catch(err => console.error(err));
+
+client.explain('SELECT * FROM default.q20 ;')
+  .then(explanation => console.log(explanation))
+  .catch(err => console.error(err));
+
+client.query('SELECT __time, sum(call_duration_fractional) FROM default.q20 GROUP BY 1;')
+  .then(result =>{ groupbydata = result;})
+  .catch(err => console.error("err",err))
+  .done(() => client.close().catch(err => console.error(err)));
+
+client.getResultsMetadata('SELECT __time, sum(call_duration_fractional) FROM default.q20 GROUP BY 1;')
+  .then(metaData => console.log(metaData))
+  .catch(err => console.error(err));
+
+client.explain('SELECT __time, sum(call_duration_fractional) FROM default.q20 GROUP BY 1;')
+  .then(explanation => console.log(explanation))
+  .catch(err => console.error(err));
 
 app.get('/apis',(req, res)=>{
   res.json(data);
-
+});
+app.get('/bigdata',(req, res)=>{
+  res.json(bigdata);
+});
+app.get('/groupByData',(req, res)=>{
+  res.json(groupbydata);
 });
 
 var annotation = {
@@ -198,6 +226,4 @@ app.all('/tag[\-]values', function(req, res) {
   res.end();
 });
 
-app.listen(8888);
-
-console.log("Server is listening to port 8081");
+app.listen(3600);
