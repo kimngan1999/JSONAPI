@@ -15,7 +15,7 @@ var now = Date.now();
 var data =[];
 var bigdata = [];
 var groupbydata = [];
-var parquet = [];
+var dataParquest = [];
 
 
 for (var i = timeserie.length -1; i >= 0; i--) {
@@ -82,16 +82,16 @@ client.explain('SELECT __time, sum(call_duration_fractional) FROM default.q20 GR
   .catch(err => console.error(err));
 
 
-  client.query('SELECT * FROM default.parquet_file ;')
-  .then(result =>{  parquet = result;})
+  client.query('SELECT * FROM default.parquet_partitions_table ;')
+  .then(result =>{  dataParquest = result; console.log(result)})
   .catch(err => console.error("err",err))
   .done(() => client.close().catch(err => console.error(err)));
 
-client.getResultsMetadata('SELECT * FROM default.parquet_file ;')
+client.getResultsMetadata('SELECT * FROM default.parquet_partitions_table ;')
   .then(metaData => console.log(metaData))
   .catch(err => console.error(err));
 
-client.explain('SELECT * FROM default.parquet_file ;')
+client.explain('SELECT * FROM default.parquet_partitions_table ;')
   .then(explanation => console.log(explanation))
   .catch(err => console.error(err));
 
@@ -103,10 +103,19 @@ app.get('/bigdata',(req, res)=>{
 });
 app.get('/groupByData',(req, res)=>{
   res.json(groupbydata);
+
 });
 
-app.get('/parquetFile',(req, res)=>{
-  res.json(parquet);
+app.get('/parquetTable',(req, res)=>{
+  try {
+    res.status(200).json(dataParquest);
+    res.end();
+    }
+    // res.status(200).send("Success")
+   catch (err) {
+    res.status(500).send(err);
+  }
+ 
 });
 
 var annotation = {
