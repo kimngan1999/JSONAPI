@@ -82,16 +82,16 @@ client.explain('SELECT __time, sum(call_duration_fractional) FROM default.q20 GR
   .catch(err => console.error(err));
 
 
-  client.query('SELECT * FROM default.parquet_partitions_table ;')
+  client.query('SELECT * FROM default.parquet_tbl ;')
   .then(result =>{  dataParquest = result; console.log(result)})
   .catch(err => console.error("err",err))
   .done(() => client.close().catch(err => console.error(err)));
 
-client.getResultsMetadata('SELECT * FROM default.parquet_partitions_table ;')
+client.getResultsMetadata('SELECT * FROM default.parquet_tbl ;')
   .then(metaData => console.log(metaData))
   .catch(err => console.error(err));
 
-client.explain('SELECT * FROM default.parquet_partitions_table ;')
+client.explain('SELECT * FROM default.parquet_tbl ;')
   .then(explanation => console.log(explanation))
   .catch(err => console.error(err));
 
